@@ -1,0 +1,33 @@
+{
+  "header": {
+    "registrant_cik": "0001067983",
+    "series_id": "S000001",
+    "class_ids": ["CL0001"],
+    "report_period_end": "2026-03-31",
+    "total_assets": "1000000",
+    "total_liabilities": "100000",
+    "net_assets": "900000"
+  },
+  "holdings": [
+    {
+      "holding_id": "HLD-1",
+      "issuer_name": "Apple Inc",
+      "cusip": "037833100",
+      "isin": "US0378331005",
+      "ticker": "AAPL",
+      "security_type": "Common Stock",
+      "security_category": "Equity",
+      "balance": "1000",
+      "units": "shares",
+      "currency": "USD",
+      "value_usd": "900000",
+      "percent_of_net_assets": "100.0000",
+      "payoff_profile": "Long",
+      "asset_category": "Equity",
+      "issuer_category": "Corporate",
+      "fair_value_level": "1",
+      "liquidity_classification": "Highly Liquid"
+    }
+  ]
+}
+

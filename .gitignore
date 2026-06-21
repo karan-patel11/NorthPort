@@ -1,0 +1,22 @@
+*.dta
+*.zip
+gcap_slice/
+nport_specs.zip
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.env
+dist/
+build/
+.DS_Store
+
+# Ignore duplicate root-level schema dump; keep canonical backend/schemas/nport/
+backend/schemas/*
+!backend/schemas/nport/
+!backend/schemas/nport/**
+
+# TypeScript / Vite generated files
+*.tsbuildinfo
+frontend/vite.config.d.ts
+frontend/vite.config.js

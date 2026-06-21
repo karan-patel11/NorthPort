@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><edgarSubmission xmlns="http://www.sec.gov/edgar/nport" xmlns:com="http://www.sec.gov/edgar/common" xmlns:ncom="http://www.sec.gov/edgar/nportcommon" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <headerData>
+    <submissionType>NPORT-P</submissionType>
+    <isConfidential>false</isConfidential>
+    <filerInfo>
+
+      <filer>
+        <issuerCredentials>
+          <cik>0001687430</cik>
+          <ccc>XXXXXXXX</ccc>
+        </issuerCredentials>
+      </filer>
+
+
+
+
+    </filerInfo>
+  </headerData>
+  <formData>
+    <genInfo>
+      <regName>Infinity Long/Short Equity Fund, LLC</regName>
+      <regFileNumber>811-23297</regFileNumber>
+      <regCik>0001687430</regCik>
+      <regLei>549300ZUBF3HMYDIYM83</regLei>
+      <regStreet1>235 WEST GALENA STREET</regStreet1>
+      <regCity>MILWAUKEE</regCity>
+      <regStateConditional regCountry="US" regState="US-WI"/>
+      <regZipOrPostalCode>53212</regZipOrPostalCode>
+      <regPhone>4142992000</regPhone>
+      <seriesName>Infinity Long/Short Equity Fund, LLC</seriesName>
+      <seriesLei>549300ZUBF3HMYDIYM83</seriesLei>
+      <repPdEnd>2022-03-31</repPdEnd>
+      <repPdDate>2021-12-31</repPdDate>
+      <isFinalFiling>N</isFinalFiling>
+    </genInfo>
+    <fundInfo>
+      <totAssets>13657121.215200000000</totAssets>
+      <totLiabs>1759482.672530000000</totLiabs>
+      <netAssets>11897638.542670000000</netAssets>
+      <assetsAttrMiscSec>0.000000000000</assetsAttrMiscSec>
+      <assetsInvested>0.000000000000</assetsInvested>
+      <amtPayOneYrBanksBorr>0.000000000000</amtPayOneYrBanksBorr>
+      <amtPayOneYrCtrldComp>0.000000000000</amtPayOneYrCtrldComp>
+      <amtPayOneYrOthAffil>0.000000000000</amtPayOneYrOthAffil>
+      <amtPayOneYrOther>0.000000000000</amtPayOneYrOther>
+      <amtPayAftOneYrBanksBorr>0.000000000000</amtPayAftOneYrBanksBorr>
+      <amtPayAftOneYrCtrldComp>0.000000000000</amtPayAftOneYrCtrldComp>
+      <amtPayAftOneYrOthAffil>0.000000000000</amtPayAftOneYrOthAffil>
+      <amtPayAftOneYrOther>0.000000000000</amtPayAftOneYrOther>
+      <delayDeliv>0.000000000000</delayDeliv>
+      <standByCommit>0.000000000000</standByCommit>
+      <liquidPref>0.000000000000</liquidPref>
+      <cshNotRptdInCorD>1098988.645198000000</cshNotRptdInCorD>
+      <isNonCashCollateral>N</isNonCashCollateral>
+      <returnInfo>
+        <monthlyTotReturns>
+          <monthlyTotReturn rtn1="0.7076150997809" rtn2="-0.5517067075094" rtn3="-0.3017850186768"/>
+        </monthlyTotReturns>
+        <othMon1 netRealizedGain="0" netUnrealizedAppr="114279.67"/>
+        <othMon2 netRealizedGain="0" netUnrealizedAppr="-58147.47"/>
+        <othMon3 netRealizedGain="3168050.34" netUnrealizedAppr="-3191818.13"/>
+      </returnInfo>
+      <mon1Flow redemption="-4543543.49" reinvestment="0" sales="0"/>
+      <mon2Flow redemption="0" reinvestment="0" sales="0"/>
+      <mon3Flow redemption="0.00" reinvestment="0" sales="0"/>
+    </fundInfo>
+	<signature>
+      <ncom:dateSigned>2022-01-26</ncom:dateSigned>
+      <ncom:nameOfApplicant>Infinity Long/Short Equity Fund, LLC</ncom:nameOfApplicant>
+      <ncom:signature>/s/ Jeffrey Vale</ncom:signature>
+      <ncom:signerName>Jeffrey Vale</ncom:signerName>
+      <ncom:title>President</ncom:title>
+    </signature>
+  </formData>
+  <documents>XXXX</documents>
+</edgarSubmission>

@@ -1,0 +1,33 @@
+[project]
+name = "northport"
+version = "0.1.0"
+description = "N-PORT pre-filing validation system"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "lxml>=5.0",
+  "pandas>=2.2",
+  "pydantic>=2.0",
+  "pyreadstat>=1.2",
+  "python-multipart>=0.0.9",
+  "uvicorn>=0.29",
+]
+
+[project.scripts]
+northport-inspect-dta = "northport.backend.ingest.inspect_dta:main"
+northport-runtime-check = "northport.backend.runtime_check:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "httpx>=0.27",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["northport/backend/tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

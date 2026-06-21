@@ -1,0 +1,3 @@
+registrant_cik,series_id,report_period_end,total_assets,total_liabilities,net_assets,holding_id,issuer_name,security_type,security_category,balance,units,currency,value_usd,percent_of_net_assets,payoff_profile,asset_category,issuer_category,fair_value_level,liquidity_classification
+0001067983,S000001,2026-03-31,1000000,100000,900000,HLD-1,Bad Issuer,Common Stock,Equity,1000,shares,ZZZ,450000,12,Long,Equity,Corporate,9,
+
