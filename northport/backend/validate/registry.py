@@ -80,6 +80,17 @@ RULES: list[Rule] = [
         "holding",
         cross_field.validate_derivative_detail,
     ),
+    # Split the blocking zero-net-assets defect from reconciliation drift so
+    # registry severity always matches the severity emitted by the rule code.
+    Rule(
+        "NP-NAV-002",
+        "Net assets are non-zero before percent-of-net-assets reconciliation.",
+        Severity.ERROR,
+        "Form N-PORT fundInfo/netAssets must be non-zero for pctVal reconciliation.",
+        ("netAssets",),
+        "filing",
+        numeric.require_nonzero_net_assets,
+    ),
     Rule(
         "NP-NAV-001",
         "Percent-of-net-assets values reconcile to total net assets within tolerance.",

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  color: #e6eaf0;
-  background: #0a0e14;
+  color: #f1f5f9;
+  background: #080b10;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,7 +20,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #0a0e14;
+  background: #080b10;
 }
 
 button,
@@ -34,7 +34,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #38bdf8;
   outline-offset: 2px;
 }
 
@@ -54,7 +54,7 @@ textarea:focus-visible {
 }
 
 .scrollbar {
-  scrollbar-color: #252d3d #0a0e14;
+  scrollbar-color: #2a3443 #080b10;
   scrollbar-width: thin;
 }
 
@@ -64,11 +64,174 @@ textarea:focus-visible {
 }
 
 .scrollbar::-webkit-scrollbar-track {
-  background: #0a0e14;
+  background: #080b10;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-  background: #252d3d;
+  background: #2a3443;
   border-radius: 8px;
 }
 
+.stage-progress {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .stage-progress::after {
+    animation: stage-scan 2.8s ease-in-out infinite;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.14), transparent);
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transform: translateX(-100%);
+    width: 60%;
+  }
+}
+
+.home-page {
+  background-image:
+    linear-gradient(rgba(42, 52, 67, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 52, 67, 0.2) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.home-hero::before {
+  background:
+    linear-gradient(115deg, rgba(8, 11, 16, 0.2), rgba(15, 20, 28, 0.68) 46%, rgba(8, 11, 16, 0.95)),
+    linear-gradient(180deg, rgba(56, 189, 248, 0.07), transparent 34%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.home-hero-content {
+  min-height: min(620px, calc(100svh - 260px));
+}
+
+.hero-depth-scene {
+  aspect-ratio: 1;
+  opacity: 0.74;
+  perspective: 1100px;
+  pointer-events: none;
+  position: absolute;
+  right: max(1.5rem, calc((100vw - 80rem) / 2));
+  top: 4.5rem;
+  width: min(38vw, 520px);
+  z-index: 0;
+}
+
+.hero-depth-object {
+  height: 100%;
+  position: relative;
+  transform: rotateX(58deg) rotateZ(-22deg);
+  transform-style: preserve-3d;
+  width: 100%;
+}
+
+.hero-depth-plane,
+.hero-depth-anchor {
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 8px;
+  position: absolute;
+}
+
+.hero-depth-plane {
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 184, 166, 0.14) 1px, transparent 1px);
+  background-size: 34px 34px;
+  inset: 12%;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+.hero-depth-plane-back {
+  opacity: 0.34;
+  transform: translateZ(-72px);
+}
+
+.hero-depth-plane-mid {
+  opacity: 0.52;
+  transform: translateZ(-22px);
+}
+
+.hero-depth-plane-front {
+  opacity: 0.74;
+  transform: translateZ(34px);
+}
+
+.hero-depth-anchor {
+  align-items: center;
+  background: rgba(15, 20, 28, 0.82);
+  box-shadow:
+    0 0 0 1px rgba(241, 245, 249, 0.04) inset,
+    0 24px 70px rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  display: flex;
+  inset: 31%;
+  justify-content: center;
+  transform: translateZ(86px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-reveal {
+    animation: home-reveal 0.7s ease both;
+    animation-range: entry 8% cover 28%;
+    animation-timeline: view();
+  }
+
+  .hero-depth-object {
+    animation: home-depth-drift 13s ease-in-out infinite;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-depth-scene {
+    bottom: 0.5rem;
+    opacity: 0.22;
+    right: -6rem;
+    top: auto;
+    width: 21rem;
+  }
+}
+
+@keyframes stage-scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  55%,
+  100% {
+    transform: translateX(180%);
+  }
+}
+
+@keyframes home-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes home-depth-drift {
+  0%,
+  100% {
+    transform: rotateX(58deg) rotateZ(-22deg) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: rotateX(61deg) rotateZ(-18deg) translate3d(0, -10px, 18px);
+  }
+}

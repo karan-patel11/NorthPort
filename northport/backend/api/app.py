@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from northport.backend.generate import assert_round_trip_stable
@@ -27,6 +28,19 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="NorthPort API", version="0.1.0", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://localhost:5173",
+        "http://localhost:5174",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 _jobs: dict[str, dict] = {}
 
@@ -40,6 +54,11 @@ class BatchRequest(BaseModel):
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.head("/health")
+def health_head() -> Response:
+    return Response(status_code=200)
 
 
 @app.get("/dashboard")

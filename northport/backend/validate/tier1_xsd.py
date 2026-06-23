@@ -4,7 +4,9 @@ from functools import lru_cache
 import os
 from pathlib import Path
 
-DEFAULT_SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schemas" / "sec_nport.xsd"
+DEFAULT_SCHEMA_PATH = (
+    Path(__file__).resolve().parents[3] / "backend" / "schemas" / "nport" / "eis_NPORT_Filer.xsd"
+)
 DEFAULT_SCHEMA_DIR = DEFAULT_SCHEMA_PATH.parent
 SCHEMA_PATH_ENV = "NORTHPORT_XSD_PATH"
 SCHEMA_DIR_ENV = "NORTHPORT_XSD_DIR"

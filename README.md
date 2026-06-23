@@ -1,67 +1,76 @@
 # NorthPort
 
-NorthPort is a pre-filing validation system for SEC Form N-PORT data. It ingests
-CSV, JSON, or raw XML sources, validates them in two tiers, generates XML, and
-produces an audit trail that ties each failure back to a rule and source row.
+NorthPort is a deterministic pre-filing validation system for SEC Form N-PORT data. It ingests fund holdings data, checks it against the SEC Form N-PORT v1.13 XSD plus NorthPort internal data-quality rules, and returns a pass/fail validation verdict with errors and warnings for review. It does **not** file to EDGAR, it is **not** SEC-certified, and EDGAR XML serialization remains future work pending complete source data.
 
-## What is built
+## Architecture
 
-- Pydantic v2 filing, header, holding, identifier, derivative, and provenance models
-- Fail-closed CSV/JSON ingestion with source-row provenance
-- Streaming GCAP `.dta` ingestion via `pyreadstat.read_dta(row_limit, row_offset)`
-- Tier-2 business-rule registry with identifier, currency, fair-value, liquidity,
-  derivative, and NAV reconciliation rules
-- Tier-1 XSD validation wrapper using `lxml.etree.XMLSchema` over the pinned
-  SEC schema bundle
-- XML generation and round-trip hooks that refuse to run until the real
-  schema-backed element mapping is implemented
-- Process-pool batch harness with SQLite content-hash cache
-- FastAPI endpoints for filings, holdings, audit reports, XML download, and batches
-- React + TypeScript + Vite frontend with TanStack Query/Table/Virtual and Recharts
+NorthPort has two validation tiers:
 
-## Correctness gate
+- **Tier 1: SEC schema validation.** The backend compiles the pinned SEC Form N-PORT v1.13 XSD bundle with local imports and network access disabled, then uses `lxml` schema validation for XML structure, field types, and cardinality.
+- **Tier 2: Internal data-quality rules.** NorthPort runs explicit Python rules over the normalized filing and holdings model for identifiers, reference data, derivatives, and NAV reconciliation.
 
-The production SEC XSD is intentionally not replaced by a permissive local schema.
-Pin the official schema bundle and point NorthPort at the bundle entrypoint:
+The pipeline is:
 
 ```text
-NORTHPORT_XSD_DIR=/path/to/sec/xsd/bundle
-NORTHPORT_XSD_ENTRYPOINT=sec_nport.xsd
+ingestion -> Tier 1 XSD -> Tier 2 rules -> validation verdict
 ```
 
-`NORTHPORT_XSD_PATH=/path/to/sec_nport.xsd` can be used instead when the
-entrypoint file is known directly. Until the bundle compiles, Tier-1 raises
-`SchemaUnavailableError`, API startup fails, and XML intake fails closed. See
-[SCHEMA_SOURCE.md](/Users/karanpatel/Documents/NorthPort/northport/backend/schemas/SCHEMA_SOURCE.md)
-for the pinning record to complete during Milestone 1.
+Ingestion accepts CSV, JSON, XML, and GCAP Stata `.dta` inputs where supported by the local backend. The validation philosophy is fail-closed: if required source fields are missing, redacted, or unusable, NorthPort records the derived value as unavailable and lets validation rules flag the gap. It does not fabricate source values to make a filing pass.
 
-## Backend
+## Validated Metrics
+
+Validated on a real GCAP 2025Q4 slice:
+
+| Metric | Value |
+| --- | ---: |
+| Filings processed | 4,024 |
+| Holdings scanned | 1,300,501 |
+| Error-level findings | 11,632 |
+| Warnings | 1,079 |
+| Passed filings | 3,585 |
+| Failed filings | 439 |
+| Throughput | ~6.7K holdings/sec |
+| Peak memory | ~668 MB/worker |
+
+FX handling: non-USD valuations are computed as `currency_value / exchange_rate` and reconciled against ECB quarter-end reference rates for 31 Dec 2025: EUR ~0.851, GBP ~0.743, and JPY ~156.7 per USD. Missing, zero, or unusable rates fail closed rather than being substituted.
+
+## Scope And Known Gaps
+
+- `NP-LIQ-001` is cut because the verified GCAP slice has no liquidity-classification column. NorthPort does not substitute unrelated fields for SEC liquidity classification.
+- EDGAR XML serialization is planned future work pending complete source data and full schema-backed element coverage.
+- The Vercel deployment is a static frontend demo. Live validation, upload, row-level drilldown, and backend-backed reports run locally with FastAPI.
+
+## Tech Stack
+
+- Backend: Python, FastAPI, `lxml`, pydantic v2, pandas, pyreadstat, multiprocessing, SQLite.
+- Frontend: React, TypeScript, Vite, Tailwind CSS.
+- Built with AI-assisted development (Claude & Codex) as development tooling, not as runtime product technology.
+
+## Screenshots
+
+TODO after deploy:
+
+- Dashboard: `docs/images/dashboard.png`
+- Rules registry: `docs/images/rules.png`
+- Batch monitor: `docs/images/batch.png`
+
+Vercel demo link: TODO after deploy.
+
+## Local Setup
+
+Backend:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
 python3 -m northport.backend.runtime_check
-python3 -m pytest
 uvicorn northport.backend.api.app:app --reload
-```
-
-The same setup is available as:
-
-```bash
-make setup
-make check-runtime
 ```
 
 The API defaults to `http://127.0.0.1:8000`.
 
-Inspect the real GCAP mapping without loading the whole slice:
-
-```bash
-python3 -m northport.backend.ingest.inspect_dta /Users/karanpatel/Downloads/gcap_slice/2025q4.dta --limit 10
-```
-
-## Frontend
+Frontend:
 
 ```bash
 cd frontend
@@ -69,45 +78,15 @@ npm install
 npm run dev
 ```
 
-Set `VITE_API_BASE` if the API is not running on `http://127.0.0.1:8000`.
+Set `VITE_API_BASE` if FastAPI is running somewhere other than `http://127.0.0.1:8000`.
 
-## Milestone Metrics
+## Static Demo Build
 
-NorthPort shows measured values only. Where no real run exists, the API and UI
-return/show `no data`.
+Vercel hosts the frontend only. Enable static demo mode so the production build renders audited GCAP reference metrics without calling FastAPI:
 
-Record these after the SEC XSD and EDGAR fixtures are pinned:
-
-| Metric | Current value | Target evidence |
-| --- | ---: | --- |
-| Tier-2 discrepancy rate | Real GCAP run required | per-rule flag rate against streamed GCAP rows |
-| Tier-1 schema pass/fail | Pending XSD/EDGAR dirs | real EDGAR XML validation |
-| Throughput | Pending benchmark | measured filings/sec and holdings/sec |
-| Memory | Pending benchmark | peak resident MB per worker |
-| Cache hit rate | Covered by unit test | rerun hit percentage |
-
-Headline format:
-
-```text
-Streaming N-PORT validation pipeline: X% schema conformance across N SEC filings,
-processing Y filings/sec at constant Z MB/worker across M cores.
+```bash
+cd frontend
+VITE_DEMO_MODE=true npm run build
 ```
 
-## Repo Layout
-
-```text
-northport/backend/
-  api/           FastAPI app
-  generate/      XML builder and round-trip checks
-  harness/       dispatcher, worker, SQLite cache
-  ingest/        CSV/JSON/XML intake
-  models/        Pydantic internal model
-  schemas/       pinned SEC schema location
-  tests/         fixtures and unit tests
-  validate/      Tier-1 XSD and Tier-2 rule registry
-frontend/
-  src/components dense fintech UI primitives
-  src/screens    dashboard, upload, filing detail, report, batch, rules
-docs/
-  field_mapping.md
-```
+In demo mode, metrics come from `frontend/src/lib/referenceRun.ts`. Controls that require the live backend show a static-demo message instead of raw fetch errors or empty failure states.

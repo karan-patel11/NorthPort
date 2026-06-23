@@ -5,24 +5,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        base: "#0A0E14",
-        surface: "#121823",
-        raised: "#1A2230",
-        hairline: "#252D3D",
-        primaryText: "#E6EAF0",
-        secondaryText: "#8A94A6",
-        accent: "#3B82F6",
-        success: "#10B981",
-        warning: "#F59E0B",
-        error: "#EF4444"
+        base: "#080B10",
+        surface: "#0F141C",
+        raised: "#161D28",
+        hairline: "#2A3443",
+        primaryText: "#F1F5F9",
+        secondaryText: "#94A3B8",
+        accent: "#38BDF8",
+        teal: "#14B8A6",
+        gold: "#D6A756",
+        success: "#22C55E",
+        warning: "#EAB308",
+        error: "#F87171"
       },
       fontFamily: {
-        brand: ["Cormorant Garamond", "Playfair Display", "Georgia", "serif"],
+        brand: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "SFMono-Regular", "Menlo", "monospace"]
       },
       borderRadius: {
         card: "8px"
+      },
+      boxShadow: {
+        panel: "0 18px 45px rgba(0, 0, 0, 0.20)"
       }
     }
   },
@@ -30,4 +35,3 @@ const config: Config = {
 };
 
 export default config;
-

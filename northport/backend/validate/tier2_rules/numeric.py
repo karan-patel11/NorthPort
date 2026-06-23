@@ -9,17 +9,24 @@ from northport.backend.validate.results import Severity, Violation
 PERCENT_TOLERANCE = Decimal("0.50")
 
 
-def reconcile_percent_of_net_assets(filing: Filing, holding: Holding | None) -> Iterable[Violation]:
+def require_nonzero_net_assets(filing: Filing, holding: Holding | None) -> Iterable[Violation]:
     del holding
     if filing.header.net_assets == 0:
         return [
             Violation(
-                rule_id="NP-NAV-001",
+                rule_id="NP-NAV-002",
                 severity=Severity.ERROR,
                 message="net assets cannot be zero for percent reconciliation",
                 provenance=None,
             )
         ]
+    return []
+
+
+def reconcile_percent_of_net_assets(filing: Filing, holding: Holding | None) -> Iterable[Violation]:
+    del holding
+    if filing.header.net_assets == 0:
+        return []
     missing_value_holdings = [item for item in filing.holdings if item.value_usd is None]
     if missing_value_holdings:
         return [

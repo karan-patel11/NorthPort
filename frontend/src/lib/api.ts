@@ -1,3 +1,13 @@
+import {
+  DEMO_DASHBOARD_SUMMARY,
+  DEMO_FILING_REPORT,
+  DEMO_HOLDINGS_RESPONSE,
+  DEMO_LATEST_BATCH,
+  IS_DEMO_MODE,
+  REFERENCE_RULES,
+  STATIC_DEMO_NOTICE
+} from "./referenceRun";
+
 export const API_BASE = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
 
 export type FilingStatus = "pass" | "warn" | "fail";
@@ -118,26 +128,44 @@ async function getJson<T>(path: string): Promise<T> {
 }
 
 export async function fetchDashboardSummary() {
+  if (IS_DEMO_MODE) {
+    return DEMO_DASHBOARD_SUMMARY;
+  }
   return getJson<DashboardSummary>("/dashboard");
 }
 
 export async function fetchLatestBatch() {
+  if (IS_DEMO_MODE) {
+    return DEMO_LATEST_BATCH;
+  }
   return getJson<{ has_data: boolean; batch: BatchResult | null }>("/batch/latest");
 }
 
 export async function fetchRules() {
+  if (IS_DEMO_MODE) {
+    return { rules: REFERENCE_RULES };
+  }
   return getJson<{ rules: RuleRow[] }>("/rules");
 }
 
 export async function fetchHoldings(filingId: string) {
+  if (IS_DEMO_MODE) {
+    return DEMO_HOLDINGS_RESPONSE;
+  }
   return getJson<HoldingsResponse>(`/filings/${filingId}/holdings?limit=500`);
 }
 
 export async function fetchReport(filingId: string) {
+  if (IS_DEMO_MODE) {
+    return DEMO_FILING_REPORT;
+  }
   return getJson<FilingReport>(`/filings/${filingId}/report`);
 }
 
 export async function uploadFiling(file: File) {
+  if (IS_DEMO_MODE) {
+    throw new Error(STATIC_DEMO_NOTICE);
+  }
   const formData = new FormData();
   formData.append("file", file);
   const response = await fetch(`${API_BASE}/filings`, {

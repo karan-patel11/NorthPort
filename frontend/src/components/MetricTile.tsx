@@ -9,7 +9,7 @@ type Props = {
 
 export function MetricTile({ label, value, detail, icon: Icon }: Props) {
   return (
-    <div className="rounded-card border border-hairline bg-surface p-4">
+    <div className="rounded-card border border-hairline bg-surface p-4 shadow-panel">
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs font-medium uppercase tracking-[0.08em] text-secondaryText">{label}</span>
         <Icon aria-hidden className="text-secondaryText" size={17} />
@@ -19,4 +19,3 @@ export function MetricTile({ label, value, detail, icon: Icon }: Props) {
     </div>
   );
 }
-

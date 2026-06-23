@@ -1,0 +1,11 @@
+{
+  "installCommand": "cd frontend && npm ci",
+  "buildCommand": "cd frontend && VITE_DEMO_MODE=true npm run build",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

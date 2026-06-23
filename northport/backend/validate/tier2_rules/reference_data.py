@@ -161,7 +161,7 @@ ISO_4217_CODES = {
     "ZWL",
 }
 
-FAIR_VALUE_LEVELS = {"1", "2", "3", "LEVEL_1", "LEVEL_2", "LEVEL_3"}
+FAIR_VALUE_LEVELS = {"1", "2", "3", "N/A"}
 
 
 def validate_currency_and_value(filing: Filing, holding: Holding | None) -> Iterable[Violation]:
@@ -224,7 +224,7 @@ def validate_fair_value_level(filing: Filing, holding: Holding | None) -> Iterab
                 holding_id=holding.holding_id,
             )
         ]
-    if holding.fair_value_level.upper() in FAIR_VALUE_LEVELS:
+    if holding.fair_value_level.strip().upper() in FAIR_VALUE_LEVELS:
         return []
     return [
         Violation(

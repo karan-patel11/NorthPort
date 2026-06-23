@@ -1,9 +1,13 @@
 import pytest
 
 from northport.backend.validate.tier1_xsd import (
+    SCHEMA_DIR_ENV,
+    SCHEMA_ENTRYPOINT_ENV,
+    SCHEMA_PATH_ENV,
     SchemaUnavailableError,
     SchemaValidationError,
     assert_schema_ready,
+    resolve_schema_path,
     validate_xml,
 )
 
@@ -11,6 +15,17 @@ from northport.backend.validate.tier1_xsd import (
 def test_tier1_fails_closed_when_schema_missing(tmp_path):
     with pytest.raises(SchemaUnavailableError):
         validate_xml(b"<root/>", xsd_path=tmp_path / "missing.xsd")
+
+
+def test_tier1_default_schema_path_loads_checked_in_entrypoint(monkeypatch):
+    for env_var in (SCHEMA_PATH_ENV, SCHEMA_DIR_ENV, SCHEMA_ENTRYPOINT_ENV):
+        monkeypatch.delenv(env_var, raising=False)
+
+    schema_path = resolve_schema_path()
+
+    assert schema_path.name == "eis_NPORT_Filer.xsd"
+    assert schema_path.parts[-4:] == ("backend", "schemas", "nport", "eis_NPORT_Filer.xsd")
+    assert_schema_ready()
 
 
 def test_tier1_fails_closed_when_schema_malformed(tmp_path):

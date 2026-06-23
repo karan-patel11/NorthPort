@@ -1,14 +1,19 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { Download, PanelRightOpen } from "lucide-react";
+import { FileOutput, PanelRightOpen } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataGrid } from "../components/DataGrid";
 import { fetchDashboardSummary, fetchHoldings, type HoldingApiRow } from "../lib/api";
+import { IS_DEMO_MODE, STATIC_DEMO_NOTICE } from "../lib/referenceRun";
+
+const XML_EXPORT_PLANNED =
+  "Serialization to EDGAR-conformant XML is scoped as future work pending complete source data.";
 
 export function FilingDetail() {
   const [selected, setSelected] = useState<HoldingApiRow | null>(null);
   const { data: dashboard } = useQuery({ queryKey: ["dashboard"], queryFn: fetchDashboardSummary });
-  const latest = dashboard?.recent_filings[0];
+  const filings = dashboard?.recent_filings ?? [];
+  const latest = filings[filings.length - 1];
   const { data: holdings } = useQuery({
     queryKey: ["holdings", latest?.id],
     queryFn: () => fetchHoldings(latest!.id),
@@ -54,22 +59,28 @@ export function FilingDetail() {
   );
 
   if (!latest) {
-    return <NoData title="Filing Detail" />;
+    return (
+      <NoData
+        title="Filing Detail"
+        message={
+          IS_DEMO_MODE
+            ? `${STATIC_DEMO_NOTICE} Row-level filing detail is available when the local FastAPI backend has processed a filing.`
+            : "no data"
+        }
+      />
+    );
   }
 
   return (
     <section className="grid gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-brand text-3xl tracking-[0.04em]">Filing Detail</h1>
+          <h1 className="font-brand text-3xl font-semibold tracking-normal">Filing Detail</h1>
           <p className="mt-1 font-mono text-sm text-secondaryText">
             {latest.id} / {latest.period}
           </p>
         </div>
-        <button className="inline-flex h-9 items-center gap-2 rounded-card border border-hairline px-3 text-sm" type="button">
-          <Download aria-hidden size={16} />
-          XML
-        </button>
+        <PlannedXmlExport />
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">
@@ -107,7 +118,7 @@ export function FilingDetail() {
 
 function Summary({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-card border border-hairline bg-surface p-4">
+    <div className="rounded-card border border-hairline bg-surface p-4 shadow-panel">
       <div className="text-xs uppercase tracking-[0.08em] text-secondaryText">{label}</div>
       <div className="mt-3 font-mono text-lg font-semibold tabular">{value}</div>
     </div>
@@ -123,14 +134,33 @@ function Trace({ label, value }: { label: string; value: string }) {
   );
 }
 
-function NoData({ title }: { title: string }) {
+function PlannedXmlExport() {
+  return (
+    <div className="grid max-w-sm gap-1 text-left sm:text-right">
+      <button
+        className="inline-flex h-9 cursor-not-allowed items-center gap-2 rounded-card border border-hairline bg-raised/50 px-3 text-sm text-secondaryText opacity-70"
+        disabled
+        title={XML_EXPORT_PLANNED}
+        type="button"
+      >
+        <FileOutput aria-hidden size={16} />
+        EDGAR XML export — planned
+      </button>
+      <p className="text-xs leading-5 text-secondaryText">{XML_EXPORT_PLANNED}</p>
+    </div>
+  );
+}
+
+function NoData({ title, message }: { title: string; message: string }) {
   return (
     <section className="grid gap-4">
       <div>
-        <h1 className="font-brand text-3xl tracking-[0.04em]">{title}</h1>
-        <p className="mt-1 text-sm text-secondaryText">no data</p>
+        <h1 className="font-brand text-3xl font-semibold tracking-normal">{title}</h1>
+        <p className="mt-1 text-sm text-secondaryText">{message}</p>
       </div>
-      <div className="rounded-card border border-dashed border-hairline bg-surface p-8 text-sm text-secondaryText">no filing selected</div>
+      <div className="rounded-card border border-dashed border-hairline bg-surface p-8 text-sm leading-6 text-secondaryText">
+        {IS_DEMO_MODE ? "Static demo uses aggregate reference metrics only." : "no filing selected"}
+      </div>
     </section>
   );
 }

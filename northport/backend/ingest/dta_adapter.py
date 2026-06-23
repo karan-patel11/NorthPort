@@ -141,7 +141,11 @@ GCAP_FIELD_MAP: dict[str, ColumnSpec] = {
     "Holding.other_issuer": ColumnSpec(("other_issuer",), required=False),
     "Holding.investment_country": ColumnSpec(("investment_country",), required=False),
     "Holding.is_restricted_security": ColumnSpec(("is_restricted_security",), required=False),
-    "Holding.fair_value_level": ColumnSpec(("fair_value_level",), required=False),
+    "Holding.fair_value_level": ColumnSpec(
+        ("fair_value_level",),
+        required=False,
+        derived="N/A when GCAP omits a fair-value level",
+    ),
     "Holding.derivative_category": ColumnSpec(("derivative_cat",), required=False),
 }
 
@@ -402,7 +406,7 @@ def _map_holding(row: dict[str, Any], *, source: str, row_number: int) -> dict[s
         "other_issuer": _optional_text(row, "Holding.other_issuer"),
         "investment_country": _optional_text(row, "Holding.investment_country"),
         "is_restricted_security": _optional_text(row, "Holding.is_restricted_security"),
-        "fair_value_level": _optional_text(row, "Holding.fair_value_level"),
+        "fair_value_level": _fair_value_level(row),
         "derivative_category": _optional_text(row, "Holding.derivative_category"),
     }
     mapped["__field_paths__"] = {
@@ -483,6 +487,10 @@ def _required_date_text(row: dict[str, Any], internal_field: str, source: str, r
 
 def _optional_text(row: dict[str, Any], internal_field: str) -> str | None:
     return _clean(_pick(row, internal_field, required=False))
+
+
+def _fair_value_level(row: dict[str, Any]) -> str:
+    return _optional_text(row, "Holding.fair_value_level") or "N/A"
 
 
 def _required_decimal(row: dict[str, Any], internal_field: str, source: str, row_number: int) -> Decimal:

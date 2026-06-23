@@ -4,6 +4,7 @@ import { Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, T
 import { MetricTile } from "../components/MetricTile";
 import { StatusPill } from "../components/StatusPill";
 import { fetchLatestBatch } from "../lib/api";
+import { IS_DEMO_MODE, STATIC_DEMO_NOTICE } from "../lib/referenceRun";
 
 export function BatchMonitor() {
   const { data } = useQuery({ queryKey: ["batch-latest"], queryFn: fetchLatestBatch });
@@ -22,8 +23,10 @@ export function BatchMonitor() {
   return (
     <section className="grid gap-4">
       <div>
-        <h1 className="font-brand text-3xl tracking-[0.04em]">Batch Monitor</h1>
-        <p className="mt-1 font-mono text-sm text-secondaryText">{hasData ? "latest measured run" : "no runs yet"}</p>
+        <h1 className="font-brand text-3xl font-semibold tracking-normal">Batch Monitor</h1>
+        <p className="mt-1 font-mono text-sm text-secondaryText">
+          {IS_DEMO_MODE ? "static reference run" : hasData ? "latest measured run" : "no runs yet"}
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -35,11 +38,16 @@ export function BatchMonitor() {
         />
         <MetricTile
           icon={DatabaseZap}
-          label="Filings/Sec"
-          value={hasData ? (batch?.filings_per_second ?? 0).toFixed(2) : "no data"}
-          detail={hasData ? `${(batch?.holdings_per_second ?? 0).toFixed(0)} holdings/sec` : "measured after run"}
+          label="Throughput"
+          value={hasData && batch ? formatHoldingsThroughput(batch.holdings_per_second) : "no data"}
+          detail={IS_DEMO_MODE ? "audited reference run" : hasData ? `${(batch?.filings_per_second ?? 0).toFixed(2)} filings/sec` : "measured after run"}
         />
-        <MetricTile icon={Cpu} label="Workers" value={hasData ? "measured" : "no data"} detail="process pool" />
+        <MetricTile
+          icon={Cpu}
+          label="Workers"
+          value={hasData ? (batch?.worker_count == null ? (IS_DEMO_MODE ? "not recorded" : "measured") : String(batch.worker_count)) : "no data"}
+          detail="process pool"
+        />
         <MetricTile
           icon={MemoryStick}
           label="MB/Worker"
@@ -50,40 +58,46 @@ export function BatchMonitor() {
 
       <div className="grid gap-4 xl:grid-cols-2">
         <ChartFrame title="Throughput">
-          {hasData ? (
+          {IS_DEMO_MODE ? (
+            <EmptyChart label="aggregate reference metric" />
+          ) : hasData ? (
             <ResponsiveContainer>
               <AreaChart data={samples}>
-                <CartesianGrid stroke="#252D3D" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: "#8A94A6", fontSize: 11 }} stroke="#252D3D" />
-                <YAxis tick={{ fill: "#8A94A6", fontSize: 11 }} stroke="#252D3D" />
-                <Tooltip contentStyle={{ background: "#121823", border: "1px solid #252D3D", color: "#E6EAF0" }} />
-                <Area dataKey="filings" fill="#3B82F6" fillOpacity={0.22} stroke="#3B82F6" />
+                <CartesianGrid stroke="#2A3443" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: "#94A3B8", fontSize: 11 }} stroke="#2A3443" />
+                <YAxis tick={{ fill: "#94A3B8", fontSize: 11 }} stroke="#2A3443" />
+                <Tooltip contentStyle={{ background: "#0F141C", border: "1px solid #2A3443", color: "#F1F5F9" }} />
+                <Area dataKey="filings" fill="#38BDF8" fillOpacity={0.22} stroke="#38BDF8" />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyChart />
+            <EmptyChart label="no data" />
           )}
         </ChartFrame>
         <ChartFrame title="Memory Per Worker">
-          {hasData && samples.some((sample) => sample.memory != null) ? (
+          {IS_DEMO_MODE ? (
+            <EmptyChart label="aggregate reference metric" />
+          ) : hasData && samples.some((sample) => sample.memory != null) ? (
             <ResponsiveContainer>
               <LineChart data={samples}>
-                <CartesianGrid stroke="#252D3D" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: "#8A94A6", fontSize: 11 }} stroke="#252D3D" />
-                <YAxis tick={{ fill: "#8A94A6", fontSize: 11 }} stroke="#252D3D" />
-                <Tooltip contentStyle={{ background: "#121823", border: "1px solid #252D3D", color: "#E6EAF0" }} />
-                <Line dataKey="memory" dot={false} stroke="#10B981" strokeWidth={2} />
+                <CartesianGrid stroke="#2A3443" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: "#94A3B8", fontSize: 11 }} stroke="#2A3443" />
+                <YAxis tick={{ fill: "#94A3B8", fontSize: 11 }} stroke="#2A3443" />
+                <Tooltip contentStyle={{ background: "#0F141C", border: "1px solid #2A3443", color: "#F1F5F9" }} />
+                <Line dataKey="memory" dot={false} stroke="#14B8A6" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyChart />
+            <EmptyChart label="no data" />
           )}
         </ChartFrame>
       </div>
 
       <div className="rounded-card border border-hairline bg-surface">
         <div className="border-b border-hairline px-4 py-3 text-sm font-semibold">Per-Filing Status</div>
-        {hasData ? (
+        {IS_DEMO_MODE ? (
+          <div className="p-6 text-sm leading-6 text-secondaryText">{STATIC_DEMO_NOTICE} Per-filing timing samples are local-run data.</div>
+        ) : hasData ? (
           <div className="grid gap-px bg-hairline p-px sm:grid-cols-2 lg:grid-cols-4">
             {samples.map((sample) => (
               <div className="bg-surface p-3" key={sample.path}>
@@ -105,19 +119,23 @@ export function BatchMonitor() {
   );
 }
 
+function formatHoldingsThroughput(value: number) {
+  return value >= 1000 ? `${(value / 1000).toFixed(1)}K holdings/sec` : `${value.toFixed(0)} holdings/sec`;
+}
+
 function ChartFrame({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-card border border-hairline bg-surface p-4">
+    <div className="rounded-card border border-hairline bg-surface p-4 shadow-panel">
       <div className="mb-3 text-sm font-semibold">{title}</div>
       <div className="h-64">{children}</div>
     </div>
   );
 }
 
-function EmptyChart() {
+function EmptyChart({ label }: { label: string }) {
   return (
     <div className="flex h-full items-center justify-center rounded-card border border-dashed border-hairline text-sm text-secondaryText">
-      no data
+      {label}
     </div>
   );
 }

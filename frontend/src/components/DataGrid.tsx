@@ -29,7 +29,7 @@ export function DataGrid<T>({ data, columns, height = 360 }: Props<T>) {
   });
 
   return (
-    <div className="overflow-hidden rounded-card border border-hairline bg-surface">
+    <div className="overflow-hidden rounded-card border border-hairline bg-surface shadow-panel">
       <div className="overflow-x-auto scrollbar">
         <div className="min-w-[760px]">
           <div className="sticky top-0 z-10 grid border-b border-hairline bg-raised">
@@ -52,7 +52,7 @@ export function DataGrid<T>({ data, columns, height = 360 }: Props<T>) {
                 const row = rows[virtualRow.index];
                 return (
                   <div
-                    className="absolute left-0 flex w-full border-b border-hairline/80 text-sm text-primaryText"
+                    className="absolute left-0 flex w-full border-b border-hairline/80 text-sm text-primaryText transition hover:bg-raised/45"
                     data-index={virtualRow.index}
                     key={row.id}
                     ref={virtualizer.measureElement}
@@ -73,4 +73,3 @@ export function DataGrid<T>({ data, columns, height = 360 }: Props<T>) {
     </div>
   );
 }
-
